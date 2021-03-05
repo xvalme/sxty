@@ -1,30 +1,44 @@
+from logging import exception
 import urllib, json, praw
+import time
 
 r = praw.Reddit('bot1')
+
+#Collecting variables
+ignore_list=["sxtybot"]
+time_to_sleep = 5
 subreddit = r.subreddit("bottesting")
 
-def collect_variables():
+def delete_post(reason):
+    print("Deleted")
     return 0
 
-def delete_post():
-    return 0
+def to_ignore(username):
+    for x in ignore_list:
+        if x == username:
+            return 0
+    return 2 
 
 def main():
-    for submission in subreddit.new(limit=50):
-
+    for submission in subreddit.new(limit=5):      #Gets the last submissions
         try:
             duration = (submission.media['reddit_video']['duration'])
 
-            if duration !== 60:
+            if duration != 60 and to_ignore(submission.author) == 2:
 
-                #Need to check if author is meant to ignore 
-                if submission.approved_by == None:
-
-                    delete_post()
+                delete_post("wrong_lenght")
 
             else:
+                print("Approved")
+                #Bot approves
 
-        except: #Not a video so will be deleted
+        except:
+            delete_post("not_a_video")
+
+    time.sleep(time_to_sleep)
+    main()
+
+
 
 
 
