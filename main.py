@@ -89,9 +89,10 @@ def main():
 
         #General clean up
         now = datetime.now()
-        if now.strftime("%M") != "00":
+        if now.strftime("%M") == "00":
             print("New hour! Time to do a general protective clean-up.")
-            for submission in subreddit.hot(limit=1000):    
+            for submission in subreddit.hot(limit=1000):  
+
                 try:
                     duration = (submission.media['reddit_video']['duration'])
     
@@ -104,6 +105,7 @@ def main():
                     if to_ignore(submission.author)==2:
                         print("Deleting a post because it was not a video.")
                         delete_post(submission, submission.id, "not_a_video")
+            print("Sucessfull Clean-up.")
         
         print("Sleeping...")
         time.sleep(time_to_sleep)
