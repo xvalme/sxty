@@ -9,15 +9,16 @@ from praw.reddit import Submission
 
 r = praw.Reddit('bot1')
 
-subred = "bottestingxval"
-subreddit = r.subreddit(subred)
-
 #Collecting variables
 while True:
 
     try:
         parser = ConfigParser()
         parser.read('config.cfg', encoding='utf-8')
+
+        subred = (parser.get("config", "subred"))
+        subred = subred.replace('"', '')
+        subreddit = r.subreddit(subred)
         ignore_list=(parser.get("config", "ignore_list"))
         time_to_sleep = int(parser.get("config", "time_to_sleep"))
         lenght = (parser.get("config", "lenght"))
@@ -66,29 +67,29 @@ def to_ignore(username):
     return 2 
 
 def main():
+    try:
+        print("Getting posts...")
+        for submission in subreddit.new(limit=5):      #Gets the last submissions
 
-    print("Getting posts...")
-    for submission in subreddit.new(limit=5):      #Gets the last submissions
+            try:
+                duration = (submission.media['reddit_video']['duration'])
 
-        try:
-            duration = (submission.media['reddit_video']['duration'])
+                if duration != lenght and to_ignore(submission.author) == 2:
 
-            if duration != lenght and to_ignore(submission.author) == 2:
+                    delete_post(submission, submission.id,"wrong_lenght")
+                    print("Deleting a post because it did not have 60seconds.")
 
-                delete_post(submission, submission.id,"wrong_lenght")
-                print("Deleting a post because it did not have 60seconds.")
+            except:
+                print("Deleting a post because it was not a video.")
+                delete_post(submission, submission.id, "not_a_video")
 
-        except:
-            print("Deleting a post because it was not a video.")
-            delete_post(submission, submission.id, "not_a_video")
-
-    time.sleep(time_to_sleep)
-    print("Sleeping...")
-    main()
-    #except:
-    #    print("Could not connect to Reddit servers. Trying again in 10sec...")
-    #    time.sleep(10)
-    #    main()
+        time.sleep(time_to_sleep)
+        print("Sleeping...")
+        main()
+    except:
+        print("Could not connect to Reddit servers. Trying again in 10sec...")
+        time.sleep(10)
+        main()
 
 #Starting database below
 if not os.path.isfile("removed_posts.txt"):
