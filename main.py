@@ -12,24 +12,30 @@ r = praw.Reddit('bot1')
 #Collecting variables
 ignore_list=["sxtybot"]
 time_to_sleep = 3
+lenght = 60
 subred = "bottestingxval"
 subreddit = r.subreddit(subred)
+type_of_message = "private" #One of “public”, “private”, “private_exposed”. 
+message_title="Post removed"
 message_wrong_lenght="a"
 message_not_a_video="b"
-removal_reason_1 =
-removal_reason_2 = 
+removal_reason_1 = 0   #not a 60 second video
+removal_reason_2 = 1   #not a video file
 
 def delete_post(submission, id, reason):
     if id not in removed_posts:
         #Answering reason why was removed
         if reason == "wrong_lenght":
-
-            submission.mod.remove(mod_note="Not a video a 60s video")
- 
-        if reason == "not_a_video":
-            reason = r.subreddit(str(subred)).mod.removal_reasons[0]
+            reason = r.subreddit(str(subred)).mod.removal_reasons[removal_reason_1]
             submission = r.submission(id=submission.id)
             submission.mod.remove(reason_id=(reason.id))
+            submission.mod.send_removal_message(message_wrong_lenght, title=message_title, type=type_of_message)
+ 
+        if reason == "not_a_video":
+            reason = r.subreddit(str(subred)).mod.removal_reasons[removal_reason_2]
+            submission = r.submission(id=submission.id)
+            submission.mod.remove(reason_id=(reason.id))
+            submission.mod.send_removal_message(message_not_a_video, title=message_title, type=type_of_message)
 
         #Registering in database
         removed_posts.append(id)
@@ -47,24 +53,29 @@ def to_ignore(username):
     return 2 
 
 def main():
-    print("Getting posts...")
-    for submission in subreddit.new(limit=5):      #Gets the last submissions
+    try:
+        print("Getting posts...")
+        for submission in subreddit.new(limit=5):      #Gets the last submissions
 
-        try:
-            duration = (submission.media['reddit_video']['duration'])
+            try:
+                duration = (submission.media['reddit_video']['duration'])
 
-            if duration != 59 and to_ignore(submission.author) == 2:
+                if duration != lenght and to_ignore(submission.author) == 2:
 
-                delete_post(submission, submission.id,"wrong_lenght")
-                print("Deleting a post because it did not have 60seconds")
+                    delete_post(submission, submission.id,"wrong_lenght")
+                    print("Deleting a post because it did not have 60seconds.")
 
-        except:
-            print("Deleting a post because it was not a video")
-            delete_post(submission, submission.id, "not_a_video")
+            except:
+                print("Deleting a post because it was not a video.")
+                delete_post(submission, submission.id, "not_a_video")
 
-    time.sleep(time_to_sleep)
-    print("Sleeping...")
-    main()
+        time.sleep(time_to_sleep)
+        print("Sleeping...")
+        main()
+    except:
+        print("Could not connect to Reddit servers. Trying again in 10sec...")
+        time.sleep(10)
+        main()
 
 
 #Starting database below
