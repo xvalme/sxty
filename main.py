@@ -4,7 +4,7 @@ import time
 import pdb
 import re
 import os
-
+from configparser import ConfigParser
 from praw.reddit import Submission
 
 r = praw.Reddit('bot1')
@@ -53,30 +53,28 @@ def to_ignore(username):
     return 2 
 
 def main():
-    try:
-        print("Getting posts...")
-        for submission in subreddit.new(limit=5):      #Gets the last submissions
+    print("Getting posts...")
+    for submission in subreddit.new(limit=5):      #Gets the last submissions
 
-            try:
-                duration = (submission.media['reddit_video']['duration'])
+        try:
+            duration = (submission.media['reddit_video']['duration'])
 
-                if duration != lenght and to_ignore(submission.author) == 2:
+            if duration != lenght and to_ignore(submission.author) == 2:
 
-                    delete_post(submission, submission.id,"wrong_lenght")
-                    print("Deleting a post because it did not have 60seconds.")
+                delete_post(submission, submission.id,"wrong_lenght")
+                print("Deleting a post because it did not have 60seconds.")
 
-            except:
-                print("Deleting a post because it was not a video.")
-                delete_post(submission, submission.id, "not_a_video")
+        except:
+            print("Deleting a post because it was not a video.")
+            delete_post(submission, submission.id, "not_a_video")
 
-        time.sleep(time_to_sleep)
-        print("Sleeping...")
-        main()
-    except:
-        print("Could not connect to Reddit servers. Trying again in 10sec...")
-        time.sleep(10)
-        main()
-
+    time.sleep(time_to_sleep)
+    print("Sleeping...")
+    main()
+    #except:
+        #print("Could not connect to Reddit servers. Trying again in 10sec...")
+        #time.sleep(10)
+        #main()
 
 #Starting database below
 if not os.path.isfile("removed_posts.txt"):
