@@ -11,20 +11,25 @@ r = praw.Reddit('bot1')
 
 #Collecting variables
 ignore_list=["sxtybot"]
-time_to_sleep = 5
-subreddit = r.subreddit("bottestingxval")
+time_to_sleep = 3
+subred = "bottestingxval"
+subreddit = r.subreddit(subred)
 message_wrong_lenght="a"
 message_not_a_video="b"
+removal_reason_1 =
+removal_reason_2 = 
 
 def delete_post(submission, id, reason):
     if id not in removed_posts:
         #Answering reason why was removed
         if reason == "wrong_lenght":
-            r.redditor(str(submission.author)).message('Post deletion', message_wrong_lenght)
-        if reason == "not_a_video":
-            r.redditor(submission.author).message('Post deletion', message_not_a_video)
 
-        submission.mod.remove()
+            submission.mod.remove(mod_note="Not a video a 60s video")
+ 
+        if reason == "not_a_video":
+            reason = r.subreddit(str(subred)).mod.removal_reasons[0]
+            submission = r.submission(id=submission.id)
+            submission.mod.remove(reason_id=(reason.id))
 
         #Registering in database
         removed_posts.append(id)
