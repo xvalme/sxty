@@ -9,18 +9,31 @@ from praw.reddit import Submission
 
 r = praw.Reddit('bot1')
 
-#Collecting variables
-ignore_list=["sxtybot"]
-time_to_sleep = 3
-lenght = 60
 subred = "bottestingxval"
 subreddit = r.subreddit(subred)
-type_of_message = "private" #One of “public”, “private”, “private_exposed”. 
-message_title="Post removed"
-message_wrong_lenght="a"
-message_not_a_video="b"
-removal_reason_1 = 0   #not a 60 second video
-removal_reason_2 = 1   #not a video file
+
+#Collecting variables
+while True:
+
+    try:
+        parser = ConfigParser()
+        parser.read('config.cfg', encoding='utf-8')
+        ignore_list=(parser.get("config", "ignore_list"))
+        time_to_sleep = int(parser.get("config", "time_to_sleep"))
+        lenght = (parser.get("config", "lenght"))
+        type_of_message = str(parser.get("config", "type_of_message"))
+        type_of_message = type_of_message.replace('"', '')
+        message_title=(parser.get("config", "message_title"))
+        message_wrong_lenght=(parser.get("config", "message_wrong_lenght"))
+        message_not_a_video=(parser.get("config", "message_not_a_video"))
+        removal_reason_1 = (int(parser.get("config", "removal_reason_1"))- 1)
+        removal_reason_2 = (int(parser.get("config", "removal_reason_2"))- 1) 
+        break
+    except:
+        print("There was an error while getting data from config file. Correct any mistakes!")
+        print("Trying again in 10 seconds.")
+        time.sleep(10)
+
 
 def delete_post(submission, id, reason):
     if id not in removed_posts:
@@ -53,6 +66,7 @@ def to_ignore(username):
     return 2 
 
 def main():
+
     print("Getting posts...")
     for submission in subreddit.new(limit=5):      #Gets the last submissions
 
@@ -72,9 +86,9 @@ def main():
     print("Sleeping...")
     main()
     #except:
-        #print("Could not connect to Reddit servers. Trying again in 10sec...")
-        #time.sleep(10)
-        #main()
+    #    print("Could not connect to Reddit servers. Trying again in 10sec...")
+    #    time.sleep(10)
+    #    main()
 
 #Starting database below
 if not os.path.isfile("removed_posts.txt"):
