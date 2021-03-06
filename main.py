@@ -6,6 +6,7 @@ import re
 import os
 from configparser import ConfigParser
 from praw.reddit import Submission
+from datetime import datetime
 
 r = praw.Reddit('bot1')
 
@@ -72,7 +73,7 @@ def to_ignore(username):
 
 def main():
         print("Getting posts...")
-        for submission in subreddit.hot(limit=5):      #Gets the last submissions
+        for submission in subreddit.new(limit=10):      #Gets the last submissions
             try:
                 duration = (submission.media['reddit_video']['duration'])
  
@@ -85,8 +86,27 @@ def main():
                 if to_ignore(submission.author)==2:
                     print("Deleting a post because it was not a video.")
                     delete_post(submission, submission.id, "not_a_video")
-        time.sleep(time_to_sleep)
+
+        #General clean up
+        now = datetime.now()
+        if now.strftime("%M") != "00":
+            print("New hour! Time to do a general protective clean-up.")
+            for submission in subreddit.hot(limit=1000):    
+                try:
+                    duration = (submission.media['reddit_video']['duration'])
+    
+                    if duration != lenght and to_ignore(submission.author) == 2:
+
+                        delete_post(submission, submission.id,"wrong_lenght")
+                        print("Deleting a post because it did not have 60seconds.")
+
+                except:
+                    if to_ignore(submission.author)==2:
+                        print("Deleting a post because it was not a video.")
+                        delete_post(submission, submission.id, "not_a_video")
+        
         print("Sleeping...")
+        time.sleep(time_to_sleep)
         main()
 
 #Starting database below
