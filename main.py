@@ -72,7 +72,7 @@ def to_ignore(username):
 
 def main():
         print("Getting posts...")
-        for submission in subreddit.hot(limit=10):      #Gets the last submissions
+        for submission in subreddit.hot(limit=5):      #Gets the last submissions
             try:
                 duration = (submission.media['reddit_video']['duration'])
  
@@ -85,8 +85,6 @@ def main():
                 if to_ignore(submission.author)==2:
                     print("Deleting a post because it was not a video.")
                     delete_post(submission, submission.id, "not_a_video")
-
-
         time.sleep(time_to_sleep)
         print("Sleeping...")
         main()
