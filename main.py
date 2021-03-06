@@ -19,7 +19,10 @@ while True:
         subred = (parser.get("config", "subred"))
         subred = subred.replace('"', '')
         subreddit = r.subreddit(subred)
+
         ignore_list=(parser.get("config", "ignore_list"))
+        ignore_list = ignore_list.split(',')
+
         time_to_sleep = int(parser.get("config", "time_to_sleep"))
         lenght = (parser.get("config", "lenght"))
         type_of_message = str(parser.get("config", "type_of_message"))
@@ -30,6 +33,7 @@ while True:
         removal_reason_1 = (int(parser.get("config", "removal_reason_1"))- 1)
         removal_reason_2 = (int(parser.get("config", "removal_reason_2"))- 1) 
         break
+
     except:
         print("There was an error while getting data from config file. Correct any mistakes!")
         print("Trying again in 10 seconds.")
@@ -67,28 +71,26 @@ def to_ignore(username):
     return 2 
 
 def main():
-    try:
         print("Getting posts...")
         for submission in subreddit.new(limit=5):      #Gets the last submissions
 
             try:
                 duration = (submission.media['reddit_video']['duration'])
-
+ 
                 if duration != lenght and to_ignore(submission.author) == 2:
 
                     delete_post(submission, submission.id,"wrong_lenght")
                     print("Deleting a post because it did not have 60seconds.")
 
             except:
-                print("Deleting a post because it was not a video.")
-                delete_post(submission, submission.id, "not_a_video")
+                if to_ignore(submission.author)==2:
+                    print("Deleting a post because it was not a video.")
+                    delete_post(submission, submission.id, "not_a_video")
+                else:
+                    pass
 
         time.sleep(time_to_sleep)
         print("Sleeping...")
-        main()
-    except:
-        print("Could not connect to Reddit servers. Trying again in 10sec...")
-        time.sleep(10)
         main()
 
 #Starting database below
