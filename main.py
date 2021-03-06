@@ -40,7 +40,6 @@ while True:
         print("Trying again in 10 seconds.")
         time.sleep(10)
 
-
 def delete_post(submission, id, reason):
     if id not in removed_posts:
         #Answering reason why was removed
@@ -122,4 +121,3 @@ else:
 
 #Start running
 main()
-
