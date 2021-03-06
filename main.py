@@ -71,6 +71,7 @@ def to_ignore(username):
     return 2 
 
 def main():
+    try:
         print("Getting posts...")
         for submission in subreddit.new(limit=10):      #Gets the last submissions
             try:
@@ -109,6 +110,11 @@ def main():
         print("Sleeping...")
         time.sleep(time_to_sleep)
         main()
+    except:
+        print("Could not contact to Reddit! Returning again in 10 seconds.")
+        print("If you tried to stop me you have to do it 2 times like super fast!")
+        time.sleep(10)
+        main()
 
 #Starting database below
 if not os.path.isfile("removed_posts.txt"):
@@ -120,4 +126,9 @@ else:
         removed_posts = list(filter(None, removed_posts))
 
 #Start running
+print("Beep. Boop. Bot is booting...")
+print("B0T by u/michaelangelito. Visit https//xval.me!")
+time.sleep(1)
+print("")
+print("Lets go! To stop me press CTRL+C 2 times really fast! It will give an error the 1st time.")
 main()
